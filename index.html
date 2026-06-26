@@ -637,6 +637,11 @@
       const guest = num("guestQty");
       const limit = getLimit();
 
+      if (meat + veg < 1) {
+        notice("orderNotice", "danger", "葷食 + 素食至少需要填寫 1 份。");
+        return false;
+      }
+
       if (meat + veg > limit) {
         notice("orderNotice", "danger", `葷食 + 素食不可超過警戒值 ${limit}。目前合計 ${meat + veg}。`);
         return false;
