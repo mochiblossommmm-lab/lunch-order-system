@@ -494,8 +494,26 @@
     document.getElementById("todayText").textContent =
       new Date().toLocaleDateString("zh-TW", { year: "numeric", month: "2-digit", day: "2-digit", weekday: "long" });
 
+    cleanupOldOrders();
+
     function todayKey() {
       return new Date().toISOString().slice(0,10);
+    }
+
+    // 每天自動清除舊的訂餐暫存資料
+    // 只清除 lunch_orders 內非今日的訂單，不清除使用者基本資料
+    function cleanupOldOrders() {
+      const orders = getOrders();
+      const today = todayKey();
+      const cleanedOrders = {};
+
+      Object.keys(orders).forEach(key => {
+        if (key.startsWith(today + "_")) {
+          cleanedOrders[key] = orders[key];
+        }
+      });
+
+      localStorage.setItem(STORAGE_ORDERS, JSON.stringify(cleanedOrders));
     }
 
     function setStep(step) {
@@ -616,7 +634,7 @@
       document.getElementById("ruleNotice").innerHTML = `
         <div class="notice warning">
           目前身分：${currentUser.role}｜警戒值：${limit}<br>
-          葷食 + 素食不可超過警戒值；一般員工不可填寫外賓。
+          葷食 + 素食至少 1 份，且不可超過警戒值；一般員工不可填寫外賓。
         </div>`;
 
       const orders = getOrders();
